@@ -669,7 +669,8 @@ MICHIGAN_SCHEMA = {
     'SUFFIX_DIRECTION': lambda: _empty(random.choice(['N', 'S', 'E', 'W'])),
     'RESIDENCE_EXTENSION': lambda: _empty(random.choice(['APT', 'LOT'])),
     'CITY': lambda: fake.city().upper(),
-    'STATE': lambda: fake.state_abbr(),
+    # 'STATE': lambda: fake.state_abbr(),
+    'STATE': lambda: random.choice(['MI']),
     'ZIP': lambda: fake.zipcode(),
     'MAIL_ADDR_1': lambda: _blank(fake.street_address().upper()),
     'MAIL_ADDR_2': lambda: _blank(fake.secondary_address().upper()),
@@ -677,24 +678,29 @@ MICHIGAN_SCHEMA = {
     'MAIL_ADDR_4': lambda: _blank(fake.state_abbr().upper()),
     'MAIL_ADDR_5': lambda: _blank(fake.zipcode()),
     'STATE_VOTER_REF': lambda: fake.numerify(text=('#'*13)),
-    'COUNTYCODE': lambda: fake.numerify(text='##'),
-    'JURISDICTION': lambda: fake.numerify(text='####'),
+    # 'COUNTYCODE': lambda: fake.numerify(text='##'),
+    'COUNTYCODE': lambda: random.choice(list(range(10, 25))),
+    # 'JURISDICTION': lambda: fake.numerify(text='####'),
+    'JURISDICTION': lambda: _empty(random.choice(['00300', '00320', '00980'])),
     'WARD_PRECINCT': lambda: fake.numerify(text='####'),
-    'SCHOOL_CODE': lambda: fake.numerify(text='##'),
+    # 'SCHOOL_CODE': lambda: fake.numerify(text='##'),
+    'SCHOOL_CODE': lambda: _empty(random.choice(['00007', '00006', '00010'])),
     'LOWER_HOUSE_DIST': lambda: fake.numerify(text='##'),
     'UPPER_HOUSE_DIST': lambda: fake.numerify(text='##'),
     'CONGRESSIONAL_DIST': lambda: str(randint(1, 16)),
     'COUNTY_BOARD_DIST': lambda: _empty(str(randint(1, 50))),
-    'VILLAGE_CODE': lambda: _empty(fake.numerify(text='####')),
+    # 'VILLAGE_CODE': lambda: _empty(fake.numerify(text='####')),
+    'VILLAGE_CODE': lambda: _empty(random.choice(['00380', '01800', '06980'])),
     'VILLAGE_PRECINCT': lambda: _empty(fake.numerify(text='###')),
     'SCHOOL_PRECINCT': lambda: _empty(fake.numerify(text='###')),
     'PERMANENT_ABSENTEE_IND': lambda: random.choice(['Y', 'N']),
     'REGISTRATION_STATUS': lambda: random.choice(['A', 'V', 'C', 'R', 'CH']),
-    'UOCAVA_STATUS': lambda: random.choice(['M', 'C', 'N', 'O']),
-    'ELECTION_DATE': lambda: fake.date(pattern='%m%d%Y'),
-    'ELECTION_TYPE': lambda: _empty(random.choice(['SPECIAL', 'GENERAL'])),
-    'ABSENTEE_TYPE': lambda: random.choice(['Y', 'N'])
+    'UOCAVA_STATUS': lambda: random.choice(['M', 'C', 'N', 'O'])
+    # 'ELECTION_DATE': lambda: fake.date(pattern='%m%d%Y'),
+    # 'ELECTION_TYPE': lambda: _empty(random.choice(['SPECIAL', 'GENERAL'])),
+    # 'ABSENTEE_TYPE': lambda: random.choice(['Y', 'N'])
 }
+
 
 UTAH_SCHEMA = {
     'Voter ID': lambda: str(randint(1, 1000000)),
@@ -907,7 +913,49 @@ def make_state_data(state_name, state_schema,
         w.writerows(state_rows)
 
 
+def make_mi_data():
+    state_rows = []
+    while len(state_rows) < NUM_ROWS:
+        r = []
+        for k in  MI.transformer.StateTransformer.input_fields:
+            r.append(str(MICHIGAN_SCHEMA[k]()))
+        state_rows.append(r)
+
+    col_indices = MI.transformer.StatePreparer.col_indices
+    with open('sample_entire_state_v.lst', 'w') as f:
+        for row in state_rows:
+            row_str = ''
+            for i, r in enumerate(row):
+                col_len = col_indices[i][1] - col_indices[i][0]
+                if len(r) > col_len:
+                    r = r[:col_len]
+                row_str += r + (' ' * (col_len - len(r)))
+            row_str += '\n'
+            f.write(row_str)
+
+    hist_voters = [[r[23], r[24], r[25], r[27]] for r in state_rows]
+    hist_rows = []
+    for i, hv in enumerate(hist_voters):
+        hv.append(random.choice(['102000004', '102000017', '102000022']))
+        hv.append(random.choice(['Y', 'N']))
+        hist_rows.append(hv)
+
+    history_indices = MI.transformer.StatePreparer.history_indices
+
+    with open('sample_entire_state_h.lst', 'w') as f:
+        for row in hist_rows:
+            row_str = ''
+            for i, r in enumerate(row):
+                col_len = history_indices[i][1] - history_indices[i][0]
+                if len(r) > col_len:
+                    r = r[:col_len]
+                row_str += r + (' ' * (col_len - len(r)))
+            row_str += '\n'
+            f.write(row_str)
+
+
 if __name__ == '__main__':
+    # make_mi_data()
     states = {'de': ([DELAWARE_SCHEMA],
                        {}),
               'co': ([COLORADO_SCHEMA],
