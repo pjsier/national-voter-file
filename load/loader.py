@@ -159,6 +159,19 @@ def load_data(opts, conf):
     ])
 
 
+def create_report_summary(opts, conf):
+    import psycopg2
+
+    try:
+        conn = psycopg2.connect(**conf['database'])
+        cur = conn.cursor()
+    except Exception as ex:
+        print('Connection error with {}: {}'.format(conf['database']['database'], ex))
+
+    # TODO: Include query generating counts here, insert into table
+
+
+
 if __name__ == '__main__':
     opts = parser.parse_args()
 

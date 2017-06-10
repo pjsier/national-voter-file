@@ -1,5 +1,12 @@
 {
   "pdi_path": "/opt/pentaho/data-integration",
   "nvf_path": "/national-voter-file",
-  "data_path": "/national-voter-file/data"
+  "data_path": "/national-voter-file/data",
+  "database": {
+    "host": "postgis",
+    "port": "5432",
+    "database": "VOTER",
+    "user": "postgres",
+    "password ": ""
+  }
 }

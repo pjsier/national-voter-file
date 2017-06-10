@@ -19,13 +19,13 @@ def getTractInfo(url, regex=''):
 
 
 
-BASE_URL = "http://www2.census.gov/geo/docs/maps-data/data/gazetteer/"
+BASE_URL = "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/"
 YEAR = datetime.datetime.now().year
 GAZ_YEAR_URL = '{}{}_Gazetteer/'.format(BASE_URL, YEAR)
 
 # For easier Windows compatibility
 OUTPUT_DIR = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.getcwd())))),
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))),
     'dimensionaldata'
 )
 if not os.path.exists(OUTPUT_DIR):
